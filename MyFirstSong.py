@@ -22,22 +22,30 @@ volume   = 100
 # MIDIFile() creates the midi file ---------------------------------------------------------------
 # removeDuplicates -> If set to True (the default), duplicate notes will be removed from the file.
 mf = MIDIFile(1, removeDuplicates=False)
+# MIDIFileArgs:(numTracks=1, removeDuplicates=True, deinterleave=True, adjust_origin=False, file_format=1, ticks_per_quarternote=960, eventtime_is_ticks=False)
 
 # Adds the tempo to the file
 mf.addTempo(track, time, tempo)
+# TempoArgs:(track, time, tempo)
 
 # ProgramChange -> Change the voice (instrument) of the pitch
 # Have to do it for each channel being used and they can be different
-# music box = 11
-mf.addProgramChange(track, 0, time, 11)
-mf.addProgramChange(track, 1, time, 1)
-mf.addProgramChange(track, 2, time, 1)
+mf.addProgramChange(track, 0, time, 0)
+mf.addProgramChange(track, 1, time, 0)
+mf.addProgramChange(track, 2, time, 0)
+# ProgramChangeArgs:(track, channel, time, program)
 
+# ControllerChange -> Controls various dynamics of pitch .i.e. mod wheel(1), pan(10), and sustain(64)
+mf.addControllerEvent(track, 0, time, 10, 0)
+mf.addControllerEvent(track, 1, time, 10, 0)
+mf.addControllerEvent(track, 2, time, 10, 127)
+# ControllerEventArgs(track, channel, time, controller_number, parameter)
 
-# Start adding music notes ------------------------------
+# Start adding music notes -----------------------------------------------------
+time = 0
 # Beginning note is a dotted quarter note
-mf.addNote(track, 0, 71, time + 0.5, enote, volume)
-
+mf.addNote(track,       0,    71, time + 0.5,    enote, volume)
+# NoteArgs:(track,channel, pitch,       time, duration, volume, annotation=None)
 
 # Begin the following notes after the dotted quarter note
 time = 1
@@ -45,7 +53,6 @@ time = 1
 for i, pitch in enumerate(ch2):
     mf.addNote(track, 2, pitch, time, snote, volume)
     time += snote
-
 
 # Restart time to overlay notes of different channels
 time = 1
@@ -57,8 +64,6 @@ time = 8
 for i, pitch in enumerate(ch1):
     mf.addNote(track, 1, pitch, time, snote, volume)
     time += snote
-mf.addNote(track, 1, 76, 10 , qnote, volume)
-
 
 # Restart time to overlay notes of different channels
 time = 1
@@ -86,8 +91,9 @@ time = 9.25
 for i, pitch in enumerate(ch0D):
     mf.addNote(track, 0, pitch, time, snote, volume)
     time += snote
+mf.addNote(track, 0, 76, 10 , qnote, volume)
 
 # Finally, write the file to a file object -----------
-with open("tristesseV2.mid", "wb") as output_file:
+with open("tristesseV4.mid", "wb") as output_file:
     mf.writeFile(output_file)
-
+#Args:          (fileHandle)
